@@ -16,55 +16,169 @@ public class Test {
         // Imprimir el mapa de beneficios
         //imprimirBeneficios(tabla);
 
+        final int individuosPorGenerar = 50;
         final int generaciones = 20;
         final int inversion = 10;
         int inversionRestante = inversion;//dinero restante a invertir (10 M)
+        ArrayList<Individuo> individuos = new ArrayList<>();//aqui se guardaran los individuos
+
         int invC1 = 0, invC2 = 0, invC3 = 0, invC4 = 0;//invertido en cada ciudad
-        double c1 = 0,c2 = 0,c3 = 0,c4 = 0;//ganancia de cada ciudad
+        double c1 = 0,c2 = 0,c3 = 0,c4 = 0;//beneficio de ciudad
+        int ciudadRandom = 0;//selector de ciudad random
 
-
-
-        //valores a calcular
-        //invertido en cada ciudad
-        invC1 = inversionAleatoria(inversionRestante);
-        inversionRestante = inversionRestante-invC1;
-
-        invC2 = inversionAleatoria(inversionRestante);
-        inversionRestante = inversionRestante-invC2;
-
-        invC3 = inversionAleatoria(inversionRestante);
-        inversionRestante = inversionRestante-invC3;
-
-        invC4 = inversionAleatoria(inversionRestante);
-        inversionRestante = inversionRestante-invC4;
-
-        //ganancias de cada ciudad:
-        c1 = ((obtenerDato(tabla,"Beneficio I", invC1)) * invC1) + invC1;//obtiene el valor de la tabla segun lo invertido y lo multiplica para obtener la ganancia
-        c2 = ((obtenerDato(tabla,"Beneficio II", invC2)) * invC2) + invC2;
-        c3 = ((obtenerDato(tabla,"Beneficio III", invC3)) * invC3) + invC3;
-        c4 = ((obtenerDato(tabla,"Beneficio IV", invC4)) * invC4) + invC4;
-
-        int v = Math.abs((invC1+invC2+invC3+invC4)-inversion);//valor absoluto de la diferencia entre la suma invertida y la inversion total (10)
-        double formula = (c1+c2+c3+c4)/(500*v+1);
-        System.out.println("Ciudad 1 ganancia:  " + c1 + " inversion " + invC1);
-        System.out.println("Ciudad 2 ganancia:  " + c2 + " inversion " + invC2);
-        System.out.println("Ciudad 3 ganancia:  " + c3 + " inversion " + invC3);
-        System.out.println("Ciudad 4 ganancia:  " + c4 + " inversion " + invC4);
-        System.out.println("Dinero restante: " + inversionRestante);
-        System.out.println("Formula " + formula);
+        //generacion de individuos
+        for (int i = 0; i < individuosPorGenerar; i++) {
+            inversionRestante = inversion;
+            Random aleatorio = new Random();
+            ArrayList<Integer> listaCiudades = new ArrayList<>();//aqui se pondran las ciudades en las que ya se invirtio, para no volver a elegirlas para volver a invertir
 
 
 
 
+            //valores iniciales a invertir
+            for (int j = 0; j < 4; j++) {//ciclo que se repite 4 veces
+                // Crear un objeto Random para generar números aleatorios
+
+                do {
+                    ciudadRandom = aleatorio.nextInt(4) + 1;//obtener un random entre 1 y 4
+                } while (listaCiudades.contains(ciudadRandom));//mientras ya se haya usado ese numero, se repíte
+
+                listaCiudades.add(ciudadRandom);//se agrega el numero nuevo al arreglo
+                switch (ciudadRandom){
+                    case 1:
+                        System.out.println("ciudad 1");
+                        invC1 = inversionAleatoria(inversionRestante);
+                        inversionRestante = inversionRestante-invC1;
+                        break;
+                    case 2:
+                        System.out.println("ciudad 2");
+                        invC2 = inversionAleatoria(inversionRestante);
+                        inversionRestante = inversionRestante-invC2;
+                        break;
+                    case 3:
+                        System.out.println("ciudad 3");
+                        invC3 = inversionAleatoria(inversionRestante);
+                        inversionRestante = inversionRestante-invC3;
+                        break;
+                    case 4:
+                        System.out.println("ciudad 4");
+                        invC4 = inversionAleatoria(inversionRestante);
+                        inversionRestante = inversionRestante-invC4;
+                        break;
+                    default:
+                        System.out.println("ERROR");
+
+                }
+            }
 
 
 
+            //valores a calcular
+
+            //beneficios de cada ciudad:
+            c1 = ((obtenerDato(tabla,"Beneficio I", invC1)));//obtiene el valor de la tabla segun lo invertido
+            c2 = ((obtenerDato(tabla,"Beneficio II", invC2)));
+            c3 = ((obtenerDato(tabla,"Beneficio III", invC3)));
+            c4 = ((obtenerDato(tabla,"Beneficio IV", invC4)));
+
+
+            int v = Math.abs((invC1+invC2+invC3+invC4)-inversion);//valor absoluto de la diferencia entre la suma invertida y la inversion total (10)
+            double formula = (c1+c2+c3+c4)/(500*v+1);//evaluar
+            System.out.println("Ciudad 1 beneficio:  " + c1 + " inversion " + invC1 );
+            System.out.println("Ciudad 2 beneficio:  " + c2 + " inversion " + invC2 );
+            System.out.println("Ciudad 3 beneficio:  " + c3 + " inversion " + invC3 );
+            System.out.println("Ciudad 4 beneficio:  " + c4 + " inversion " + invC4 );
+            System.out.println("Dinero restante: " + inversionRestante);
+            System.out.println("Formula " + formula);
+
+            String cromosoma =  enterosACromosoma(invC1,invC2,invC3,invC4);
+
+            System.out.println("cromosoma:" + cromosoma);
+            System.out.println("cromosoma transformado: " + cromosomaAEnteros(cromosoma));
+
+            individuos.add(new Individuo(cromosoma,formula));
+
+        }
+        Collections.sort(individuos);//ordenar los individuos
+        imprimirIndividuos(individuos);
+
+
+
+
+        // cruzar los mas altos (80% cruzar) y generar nueva poblacion
+
+
+
+    }
+
+    //metodo para imprimir los individuos
+    public static void imprimirIndividuos(ArrayList<Individuo> individuos) {
+        System.out.println("Individuos:");
+        for (Individuo individuo : individuos) {
+            System.out.println("Cromosoma: " + individuo.getCromosoma() + ", Formula: " + individuo.getFormula());
+        }
+    }
+    //transforma el cromosoma en enteros
+    public static ArrayList<Integer> cromosomaAEnteros(String cromosoma) {
+        ArrayList<Integer> enteros = new ArrayList<>();
+        if (cromosoma.length() != 16) {
+            System.out.println("El cromosoma debe tener exactamente 16 caracteres.");
+        }else {
+            String cadena1 = cromosoma.substring(0, 4);
+            String cadena2 = cromosoma.substring(4, 8);
+            String cadena3 = cromosoma.substring(8, 12);
+            String cadena4 = cromosoma.substring(12, 16);
+
+            enteros.add(binarioAEntero(cadena1));
+            enteros.add(binarioAEntero(cadena2));
+            enteros.add(binarioAEntero(cadena3));
+            enteros.add(binarioAEntero(cadena4));
+        }
+
+        return enteros;
+    }
+    //binario a entero
+    public static int binarioAEntero(String binario) {
+        // Verificar que el string tenga exactamente 4 caracteres y sean '0' o '1'
+        if (binario.length() != 4 || !binario.matches("[01]+")) {
+            System.out.println("El número binario debe tener exactamente 4 caracteres y contener solo 0s y 1s.");
+            return -1; // Valor de retorno para indicar un error
+        }
+
+        // Convertir el número binario a entero usando Integer.parseInt()
+        return Integer.parseInt(binario, 2);
+    }
+    //4 enteros a cromosoma
+    public static String enterosACromosoma(int invC1, int invC2, int invC3, int invC4){
         //cromosomas de ciudad y cromosoma completo
         String cromosoma ;
         String cadena1,cadena2,cadena3,cadena4;
 
+        cadena1 = convertirABinario(invC1);
+        cadena2 = convertirABinario(invC2);
+        cadena3 = convertirABinario(invC3);
+        cadena4 = convertirABinario(invC4);
 
+        cromosoma = cadena1 + cadena2 + cadena3 + cadena4;
 
+        return cromosoma;
+    }
+    //convierte numero a binario de 4 caracteres
+    public static String convertirABinario(int numero) {
+        if (numero == 0) {
+            return "0000";
+        }
+        StringBuilder resultado = new StringBuilder();
+        while (numero > 0) {
+            int residuo = numero % 2;
+            resultado.insert(0, residuo); // Insertar el residuo al inicio de la cadena
+            numero = numero / 2;
+        }
+        //agregar 0 para hacerlo de 4 caracteres
+        while (resultado.length()<4){
+            resultado.insert(0, '0');
+        }
+        return resultado.toString();
     }
 
 
@@ -126,4 +240,27 @@ public class Test {
     }
 
 
+}
+
+class Individuo implements Comparable<Individuo>{
+    private String cromosoma;
+    private double formula;
+
+    public Individuo(String cromosoma, double formula) {
+        this.cromosoma = cromosoma;
+        this.formula = formula;
+    }
+
+    public String getCromosoma() {
+        return cromosoma;
+    }
+
+    public double getFormula() {
+        return formula;
+    }
+
+    @Override
+    public int compareTo(Individuo o) {
+        return Double.compare(o.getFormula(), this.getFormula());
+    }
 }
