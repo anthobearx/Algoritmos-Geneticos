@@ -3,9 +3,12 @@ package org.example;
 import java.util.*;
 
 public class Test {
+    //variables estaticas (variables de toda la clase)
+    static Map<String, double[]> tabla;
+    static ArrayList<Individuo> individuos;//aqui se guardaran los individuos
     public static void main(String[] args) {
         //la tabla de beneficios segun las ciudades son de la siguiente forma
-        Map<String, double[]> tabla = new HashMap<>();
+        tabla = new HashMap<>();
         // Agregar datos a la tabla
         tabla.put("Inversion", new double[]{0,1,2,3,4,5,6,7,8,9,10});
         tabla.put("Beneficio I", new double[]{0, 0.28, 0.45, 0.65, 0.78, 0.90, 1.02, 1.13, 1.23, 1.32, 1.38});
@@ -20,7 +23,7 @@ public class Test {
         final int generaciones = 20;
         final int inversion = 10;
         int inversionRestante = inversion;//dinero restante a invertir (10 M)
-        ArrayList<Individuo> individuos = new ArrayList<>();//aqui se guardaran los individuos
+        individuos = new ArrayList<>();//aqui se guardaran los individuos
 
         int invC1 = 0, invC2 = 0, invC3 = 0, invC4 = 0;//invertido en cada ciudad
         double c1 = 0,c2 = 0,c3 = 0,c4 = 0;//beneficio de ciudad
@@ -101,13 +104,89 @@ public class Test {
         }
         Collections.sort(individuos);//ordenar los individuos
         imprimirIndividuos(individuos);
-
+        //cruzaDeDosPuntos(new Individuo("1000000010110011",0.1),new Individuo("0100010010011100",0.1));
+        //cromosomaAFormula("0100010000000010");
 
 
 
         // cruzar los mas altos (80% cruzar) y generar nueva poblacion
 
 
+
+    }
+    //metodo que selecciona el 80% de los individuos y los cruza todos con todos
+    public static void seleccionYCruza(){
+        ArrayList<String> cromosomasHijos = new ArrayList<>();
+        int cantidadIndividuos = individuos.size();
+        int seleccionados = (int)(cantidadIndividuos*0.8);//seleccionar el 80% de los generados
+        //en teoria ya estan ordenados los individuos
+
+        for (int i = 0; i < seleccionados; i++) {
+            cromosomasHijos = cruzaDeDosPuntos(individuos.get(i),individuos.get(i+1));//obtener los dos hijos
+            //ocupo separar el arreglo (los dos hijos en string diferente, y obtener la formula, despues agregarlo a individuo)
+
+
+        }
+
+    }
+
+
+
+
+
+    //metodo que reciba dos individuos y cruce con dos puntos sus cromosomas y de como resultado dos nuevos individuod (hijos, ya cruzados)
+
+    public static ArrayList<String> cruzaDeDosPuntos(Individuo individuoPadre1, Individuo individuoPadre2){
+        ArrayList<String> hijos = new ArrayList<>();
+        String padre1 = individuoPadre1.getCromosoma();
+        String padre2 = individuoPadre2.getCromosoma();
+        //hace la cruza de dos puntos
+        String hijo1 = padre1.substring(0, 5) + padre2.substring(5, 11)
+                + padre1.substring(11);
+
+        String hijo2 = padre2.substring(0, 5) + padre1.substring(5, 11)
+                + padre2.substring(11);
+
+        System.out.println("hijo1: " + hijo1);
+        System.out.println("hijo2: " + hijo2);
+
+        hijos.add(hijo1);
+        hijos.add(hijo2);
+
+        return hijos;
+    }
+    //evalua los cromosomas recibidos
+    public static void cromosomaAFormula(String cromosoma){
+        ArrayList<Integer> enteros = new ArrayList<>();
+        int inversion = 10;
+        int inversionRestante = inversion;
+
+        enteros = cromosomaAEnteros(cromosoma);
+
+        System.out.println("inversiones : "+enteros);
+        //valores a calcular
+
+        //beneficios de cada ciudad:
+        double c1 = ((obtenerDato(tabla,"Beneficio I", enteros.get(0))));//obtiene el valor de la tabla segun lo invertido
+        double c2 = ((obtenerDato(tabla,"Beneficio II", enteros.get(1))));
+        double  c3 = ((obtenerDato(tabla,"Beneficio III", enteros.get(2))));
+        double c4 = ((obtenerDato(tabla,"Beneficio IV", enteros.get(3))));
+        inversionRestante = inversionRestante-(enteros.get(0)+enteros.get(1)+enteros.get(2)+enteros.get(3));
+
+
+        int v = Math.abs((enteros.get(0)+enteros.get(1)+enteros.get(2)+enteros.get(3))-inversion);//valor absoluto de la diferencia entre la suma invertida y la inversion total (10)
+        double formula = (c1+c2+c3+c4)/(500*v+1);//evaluar
+        System.out.println("Ciudad 1 beneficio:  " + c1 + " inversion " + enteros.get(0) );
+        System.out.println("Ciudad 2 beneficio:  " + c2 + " inversion " + enteros.get(1) );
+        System.out.println("Ciudad 3 beneficio:  " + c3 + " inversion " + enteros.get(2) );
+        System.out.println("Ciudad 4 beneficio:  " + c4 + " inversion " + enteros.get(3) );
+        System.out.println("Dinero restante: " + inversionRestante);
+        System.out.println("Formula " + formula);
+
+    }
+    //por ahora no haria nada
+    public static void validarCromosoma(String cromosoma){
+        //un cromosoma valido seria de que cada caracter no pase de 10 y la suma siempre igual a 10
 
     }
 
