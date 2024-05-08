@@ -3,6 +3,7 @@ package org.example;
 import java.util.*;
 
 public class Test {
+    //version presentada
     //variables estaticas (variables de toda la clase)
     static Map<String, double[]> tabla;
     static ArrayList<Individuo> individuos;//aqui se guardaran los individuos
