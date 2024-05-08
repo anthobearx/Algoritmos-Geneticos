@@ -188,6 +188,7 @@ public class Test {
     //por ahora no haria nada
     public static void validarCromosoma(String cromosoma){
         //un cromosoma valido seria de que cada caracter no pase de 10 y la suma siempre igual a 10
+        System.out.println("Print de prueba");
 
     }
 
